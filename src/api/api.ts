@@ -13,6 +13,17 @@ export const api = axios.create({
 	paramsSerializer: (params) => stringify(params, { encode: true }),
 });
 
+// Pridaj interceptor na odpovede
+/* api.interceptors.response.use(
+	(response) => response, // Ak je odpoveď OK, necháme ju prejsť
+	(error) => {
+		if (error.response && error.response.status === 401) {
+			window.location.href = "/login"; // Presmerovanie na login stránku
+		}
+		return Promise.reject(error);
+	},
+); */
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const fetchSensors = (params?: any): Promise<any> => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any

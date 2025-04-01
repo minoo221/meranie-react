@@ -3,10 +3,12 @@ import { InputText } from "primereact/inputtext";
 import { useEffect, useState } from "react";
 import { fetchProfile, login } from "../api/api";
 import { UserLoginType } from "../types/user";
+import { useNavigate } from "react-router";
 
 function Login() {
 	const [identifier, setIdentifier] = useState<string>("");
 	const [password, setPassword] = useState<string>("");
+	const navigate = useNavigate();
 
 	const handleIdentifierChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setIdentifier(e.target.value);
@@ -39,6 +41,7 @@ function Login() {
 		fetchProfile()
 			.then((data: UserLoginType) => {
 				console.log("login", data);
+				navigate("/");
 			})
 			.catch((err: Error) => {
 				console.error(err);
