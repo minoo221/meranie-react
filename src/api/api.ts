@@ -3,6 +3,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { stringify } from "qs";
 import { FlowmeterType } from "../types/flowmeter";
 import { UserLoginType } from "../types/user";
+import { ThermometerType } from "../types/thermometer";
 
 export const api = axios.create({
 	baseURL: apiUrl,
@@ -24,10 +25,8 @@ export const api = axios.create({
 	},
 ); */
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fetchSensors = (params?: any): Promise<any> => {
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	return api.get(`vip`, { params }).then((response: AxiosResponse<any>) => response.data);
+export const fetchThermo = (params?: unknown): Promise<ThermometerType[]> => {
+	return api.get(`/sensors`, { params }).then((response: AxiosResponse<ThermometerType[]>) => response.data);
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
