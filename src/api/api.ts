@@ -39,6 +39,10 @@ export const fetchLastFlowmeter = (): Promise<FlowmeterType> => {
 	return api.get(`/flowmeter/last`).then((response: AxiosResponse<FlowmeterType>) => response.data);
 };
 
+export const fetchMeasurements = (params?: unknown): Promise<ThermometerType[]> => {
+	return api.get(`/measurements`, { params }).then((response: AxiosResponse<ThermometerType[]>) => response.data);
+};
+
 export const login = (body: UserLoginType): Promise<UserLoginType> => {
 	return api.post(`/auth/login`, body).then((response: AxiosResponse<UserLoginType>) => response.data);
 };

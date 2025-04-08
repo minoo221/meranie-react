@@ -1,15 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import FlowmeterData from "./components/FlowmeterData";
-import { fetchLastFlowmeter, fetchThermo } from "./api/api";
+import { fetchLastFlowmeter, fetchMeasurements, fetchThermo } from "./api/api";
 import { FlowmeterType } from "./types/flowmeter";
 import { Divider } from "primereact/divider";
 import { ThermometerType } from "./types/thermometer";
+import ChartsData from "./components/ChartsData";
+
+type SensorType = "flowmeter" | "thermometer" | "pressure";
 
 export default function App() {
 	/* const data = use(fetchSensors().catch((err: Error) => setError(err))); */
 	const [lastFlowmeter, setLastFlowmeter] = useState<FlowmeterType | null>(null); // Ukladáme dáta
 	const [lastThermo, setLastThermo] = useState<ThermometerType[] | []>([]); // Ukladáme dáta
 	const [loading, setLoading] = useState(true); // Stav načítania
+	const [visible, setVisible] = useState(false); // Stav viditeľnosti
+	const [selectedSensorType, setSelectedSensorType] = useState<SensorType>("thermometer"); // Vybraný senzor
 
 	const fetchFlowmeterData = () => {
 		fetchLastFlowmeter()
@@ -41,13 +46,19 @@ export default function App() {
 			});
 	};
 
+	const handleSensorClick = (item: unknown, sensorType: SensorType) => {
+		console.log("Sensor clicked", item);
+		setSelectedSensorType(sensorType);
+		setVisible(true);
+	};
+
 	useEffect(() => {
 		fetchFlowmeterData();
 		fetchThermometerData();
-		setInterval(() => {
+		/* setInterval(() => {
 			fetchFlowmeterData();
 			fetchThermometerData();
-		}, 5000);
+		}, 5000); */
 	}, []);
 
 	const thermoItems = lastThermo.map((item) => (
@@ -55,8 +66,10 @@ export default function App() {
 			key={item.id} // Dôležité pre React pri renderovaní zoznamov
 			title={item.location}
 			value={item.last_value}
+			sensorType="thermometer"
 			unit="°C"
 			icon={"/images/thermometer.png"}
+			onClick={() => handleSensorClick(item, "thermometer")}
 		/>
 	));
 
@@ -80,15 +93,18 @@ export default function App() {
 						value={lastFlowmeter?.litres}
 						unit="L"
 						icon={"/images/water.png"}
+						sensorType="flowmeter"
 					/>
 					<FlowmeterData
 						title="Aktuálna spotreba"
 						value={lastFlowmeter?.litres_per_minute}
 						unit="L/min"
 						icon={"/images/water-pipe.png"}
+						sensorType="flowmeter"
 					/>
 				</div>
 			</div>
+			<ChartsData sensorType={selectedSensorType} visible={visible} />
 		</>
 	);
 }

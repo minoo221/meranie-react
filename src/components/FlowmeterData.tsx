@@ -6,9 +6,11 @@ interface FlowmeterDataProps {
 	value?: string | number;
 	unit?: string;
 	icon?: string;
+	sensorType: "flowmeter" | "thermometer" | "pressure";
+	onClick?: () => void;
 }
 
-function FlowmeterData({ title, value, unit, icon }: FlowmeterDataProps) {
+function FlowmeterData({ title, value, unit, icon, onClick }: FlowmeterDataProps) {
 	return (
 		<Card
 			pt={{
@@ -23,6 +25,7 @@ function FlowmeterData({ title, value, unit, icon }: FlowmeterDataProps) {
 				}),
 			}}
 			className="md:col-span-1"
+			onClick={onClick}
 		>
 			<div className="mr-4 ">
 				<img src={icon} alt="water" className="!w-15" />
