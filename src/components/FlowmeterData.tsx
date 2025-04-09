@@ -1,5 +1,4 @@
 import { Card } from "primereact/card";
-import { FlowmeterType } from "../types/flowmeter";
 
 interface FlowmeterDataProps {
 	title?: string;

@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import FlowmeterData from "./components/FlowmeterData";
-import { fetchLastFlowmeter, fetchMeasurements, fetchThermo } from "./api/api";
+import { fetchAllMeasurements, fetchAllTimestamps, fetchLastFlowmeter, fetchThermo } from "./api/api";
 import { FlowmeterType } from "./types/flowmeter";
 import { Divider } from "primereact/divider";
-import { ThermometerType } from "./types/thermometer";
+import { MeasurementsParamsType, ThermometerType } from "./types/thermometer";
 import ChartsData from "./components/ChartsData";
+import { DateTime } from "luxon";
 
 type SensorType = "flowmeter" | "thermometer" | "pressure";
 
@@ -15,6 +16,9 @@ export default function App() {
 	const [loading, setLoading] = useState(true); // Stav načítania
 	const [visible, setVisible] = useState(false); // Stav viditeľnosti
 	const [selectedSensorType, setSelectedSensorType] = useState<SensorType>("thermometer"); // Vybraný senzor
+	const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null); // Vybraný senzor
+	const [selectedSensorData, setSelectedSensorData] = useState<unknown | null>(null); // Vybrané dáta senzora
+	const [selectedSensorTimestamps, setSelectedSensorTimestamps] = useState<string[]>([]); // Vybrané dáta senzora
 
 	const fetchFlowmeterData = () => {
 		fetchLastFlowmeter()
@@ -46,8 +50,52 @@ export default function App() {
 			});
 	};
 
-	const handleSensorClick = (item: unknown, sensorType: SensorType) => {
+	const fetchAllMeasurementsData = () => {
+		const params = {
+			start: "2025-03-01 00:00:00",
+			end: "2025-04-04 00:00:00",
+		}
+		fetchAllMeasurements(params)
+			.then((data: ThermometerType[]) => {
+
+				console.log("lastFlowmeter", data);
+			})
+			.catch((err: Error) => {
+				console.error(err);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+
+	}
+
+	const fetchAllTimestampsData = (params: MeasurementsParamsType) => {
+		fetchAllTimestamps(params)
+			.then((data: ThermometerType[]) => {
+
+				console.log("lastFlowmeter", data);
+			})
+			.catch((err: Error) => {
+				console.error(err);
+			})
+			.finally(() => {
+				setLoading(false);
+			});
+	}
+
+
+	const handleThermometerClick = (item: ThermometerType, sensorType: SensorType) => {
 		console.log("Sensor clicked", item);
+
+		const paramsTimestamps = {
+			start: DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd HH:mm:ss"),
+			end: DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss"),
+			sensorIds: item.id,
+		}
+
+		fetchAllTimestampsData(paramsTimestamps)
+
+
 		setSelectedSensorType(sensorType);
 		setVisible(true);
 	};
@@ -55,6 +103,8 @@ export default function App() {
 	useEffect(() => {
 		fetchFlowmeterData();
 		fetchThermometerData();
+		fetchAllMeasurementsData();
+		fetchAllTimestampsData();
 		/* setInterval(() => {
 			fetchFlowmeterData();
 			fetchThermometerData();
@@ -69,7 +119,7 @@ export default function App() {
 			sensorType="thermometer"
 			unit="°C"
 			icon={"/images/thermometer.png"}
-			onClick={() => handleSensorClick(item, "thermometer")}
+			onClick={() => handleThermometerClick(item, "thermometer")}
 		/>
 	));
 

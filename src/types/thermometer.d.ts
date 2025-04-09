@@ -5,3 +5,9 @@ export interface ThermometerType {
 	last_value: number;
 	last_timestamp: string;
 }
+
+export interface MeasurementsParamsType {
+	start: string;
+	end: string;
+	sensorIds?: string;
+}

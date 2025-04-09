@@ -1,9 +1,9 @@
-import axios, { AxiosResponse, AxiosHeaders } from "axios";
+import axios, { AxiosResponse } from "axios";
 const apiUrl = import.meta.env.VITE_API_URL;
 import { stringify } from "qs";
 import { FlowmeterType } from "../types/flowmeter";
 import { UserLoginType } from "../types/user";
-import { ThermometerType } from "../types/thermometer";
+import { MeasurementsParamsType, ThermometerType } from "../types/thermometer";
 
 export const api = axios.create({
 	baseURL: apiUrl,
@@ -25,28 +25,44 @@ export const api = axios.create({
 	},
 ); */
 
-export const fetchThermo = (params?: unknown): Promise<ThermometerType[]> => {
-	return api.get(`/sensors`, { params }).then((response: AxiosResponse<ThermometerType[]>) => response.data);
+export const fetchThermo = async (params?: unknown): Promise<ThermometerType[]> => {
+	const response = await api.get(`/sensors`, { params });
+	return response.data;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const fetchFlowmeter = (params?: unknown): Promise<any> => {
+export const fetchFlowmeter = (params?: MeasurementsParamsType): Promise<any> => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	return api.get(`/flowmeter`, { params }).then((response: AxiosResponse<any>) => response.data);
 };
 
-export const fetchLastFlowmeter = (): Promise<FlowmeterType> => {
-	return api.get(`/flowmeter/last`).then((response: AxiosResponse<FlowmeterType>) => response.data);
+export const fetchLastFlowmeter = async (): Promise<FlowmeterType> => {
+	const response = await api.get(`/flowmeter/last`);
+	return response.data;
 };
 
-export const fetchMeasurements = (params?: unknown): Promise<ThermometerType[]> => {
-	return api.get(`/measurements`, { params }).then((response: AxiosResponse<ThermometerType[]>) => response.data);
+export const fetchMeasurements = async (params?: MeasurementsParamsType): Promise<ThermometerType[]> => {
+	const response = await api.get(`/measurements`, { params });
+	return response.data;
 };
 
-export const login = (body: UserLoginType): Promise<UserLoginType> => {
-	return api.post(`/auth/login`, body).then((response: AxiosResponse<UserLoginType>) => response.data);
+export const fetchAllMeasurements = async (params?: MeasurementsParamsType): Promise<ThermometerType[]> => {
+	const response = await api.get(`/measurements/all`, { params });
+	return response.data;
 };
 
-export const fetchProfile = (): Promise<UserLoginType> => {
-	return api.get(`/auth/profile`, { withCredentials: true }).then((response: AxiosResponse<UserLoginType>) => response.data);
+export const fetchAllTimestamps = async (params?: MeasurementsParamsType): Promise<string[]> => {
+	const response = await api.get(`/measurements/timestamps`, { params });
+	return response.data;
 };
+
+export const login = async (body: UserLoginType): Promise<UserLoginType> => {
+	const response = await api.post(`/auth/login`, body);
+	return response.data;
+};
+
+export const fetchProfile = async (): Promise<UserLoginType> => {
+	const response = await api.get(`/auth/profile`, { withCredentials: true });
+	return response.data;
+};
+
