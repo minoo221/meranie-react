@@ -3,7 +3,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { stringify } from "qs";
 import { FlowmeterType } from "../types/flowmeter";
 import { UserLoginType } from "../types/user";
-import { MeasurementsParamsType, ThermometerType } from "../types/thermometer";
+import { AllMeasurementsType, MeasurementsParamsType, ThermometerType } from "../types/thermometer";
 
 export const api = axios.create({
 	baseURL: apiUrl,
@@ -46,7 +46,7 @@ export const fetchMeasurements = async (params?: MeasurementsParamsType): Promis
 	return response.data;
 };
 
-export const fetchAllMeasurements = async (params?: MeasurementsParamsType): Promise<ThermometerType[]> => {
+export const fetchAllMeasurements = async (params?: MeasurementsParamsType): Promise<AllMeasurementsType[]> => {
 	const response = await api.get(`/measurements/all`, { params });
 	return response.data;
 };
@@ -65,4 +65,3 @@ export const fetchProfile = async (): Promise<UserLoginType> => {
 	const response = await api.get(`/auth/profile`, { withCredentials: true });
 	return response.data;
 };
-

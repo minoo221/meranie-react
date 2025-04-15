@@ -3,7 +3,7 @@ import FlowmeterData from "./components/FlowmeterData";
 import { fetchAllMeasurements, fetchAllTimestamps, fetchLastFlowmeter, fetchThermo } from "./api/api";
 import { FlowmeterType } from "./types/flowmeter";
 import { Divider } from "primereact/divider";
-import { MeasurementsParamsType, ThermometerType } from "./types/thermometer";
+import { AllMeasurementsType, MeasurementsParamsType, ThermometerType } from "./types/thermometer";
 import ChartsData from "./components/ChartsData";
 import { DateTime } from "luxon";
 
@@ -17,7 +17,7 @@ export default function App() {
 	const [visible, setVisible] = useState(false); // Stav viditeľnosti
 	const [selectedSensorType, setSelectedSensorType] = useState<SensorType>("thermometer"); // Vybraný senzor
 	const [selectedSensorId, setSelectedSensorId] = useState<string | null>(null); // Vybraný senzor
-	const [selectedSensorData, setSelectedSensorData] = useState<unknown | null>(null); // Vybrané dáta senzora
+	const [measurementAllData, setMeasurementAllData] = useState<AllMeasurementsType[] | []>([]); // Vybrané dáta senzora
 	const [selectedSensorTimestamps, setSelectedSensorTimestamps] = useState<string[]>([]); // Vybrané dáta senzora
 
 	const fetchFlowmeterData = () => {
@@ -54,11 +54,11 @@ export default function App() {
 		const params = {
 			start: "2025-03-01 00:00:00",
 			end: "2025-04-04 00:00:00",
-		}
+		};
 		fetchAllMeasurements(params)
-			.then((data: ThermometerType[]) => {
-
-				console.log("lastFlowmeter", data);
+			.then((data: AllMeasurementsType[]) => {
+				console.log("fetchAllMeasurementsData", data);
+				setMeasurementAllData(data);
 			})
 			.catch((err: Error) => {
 				console.error(err);
@@ -66,14 +66,13 @@ export default function App() {
 			.finally(() => {
 				setLoading(false);
 			});
+	};
 
-	}
-
-	const fetchAllTimestampsData = (params: MeasurementsParamsType) => {
-		fetchAllTimestamps(params)
-			.then((data: ThermometerType[]) => {
-
-				console.log("lastFlowmeter", data);
+	const fetchAllTimestampsData = async (params: MeasurementsParamsType) => {
+		await fetchAllTimestamps(params)
+			.then((data: string[]) => {
+				setSelectedSensorTimestamps(data);
+				console.log("fetchAllTimestampsData", data);
 			})
 			.catch((err: Error) => {
 				console.error(err);
@@ -81,21 +80,18 @@ export default function App() {
 			.finally(() => {
 				setLoading(false);
 			});
-	}
+	};
 
-
-	const handleThermometerClick = (item: ThermometerType, sensorType: SensorType) => {
+	const handleThermometerClick = async (item: ThermometerType, sensorType: SensorType) => {
 		console.log("Sensor clicked", item);
 
 		const paramsTimestamps = {
-			start: DateTime.now().minus({ days: 1 }).toFormat("yyyy-MM-dd HH:mm:ss"),
+			start: DateTime.now().minus({ days: 30 }).toFormat("yyyy-MM-dd HH:mm:ss"),
 			end: DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss"),
-			sensorIds: item.id,
-		}
+			/*sensorIds: item.name.toString(),*/
+		};
 
-		fetchAllTimestampsData(paramsTimestamps)
-
-
+		await fetchAllTimestampsData(paramsTimestamps);
 		setSelectedSensorType(sensorType);
 		setVisible(true);
 	};
@@ -104,7 +100,6 @@ export default function App() {
 		fetchFlowmeterData();
 		fetchThermometerData();
 		fetchAllMeasurementsData();
-		fetchAllTimestampsData();
 		/* setInterval(() => {
 			fetchFlowmeterData();
 			fetchThermometerData();
@@ -154,7 +149,13 @@ export default function App() {
 					/>
 				</div>
 			</div>
-			<ChartsData sensorType={selectedSensorType} visible={visible} />
+			<ChartsData
+				sensorType={selectedSensorType}
+				visible={visible}
+				labels={selectedSensorTimestamps}
+				measurementData={measurementAllData}
+				onClose={() => setVisible(false)}
+			/>
 		</>
 	);
 }

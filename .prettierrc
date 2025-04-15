@@ -3,6 +3,6 @@
 	"arrowParens": "always",
 	"semi": true,
 	"printWidth": 140,
-	"tabWidth": 8,
+	"tabWidth": 4,
 	"useTabs": true
 }
